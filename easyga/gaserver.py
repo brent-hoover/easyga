@@ -3,7 +3,8 @@
 
 """
 用来作为接受google统计上报的server端
-通过zmq通道
+通过zmq通道。
+参考网址: http://learning-0mq-with-pyzmq.readthedocs.org/en/latest/pyzmq/pyzmq.html
 """
 
 import pickle
@@ -54,15 +55,16 @@ class GAServer(object):
             import zmq.green as zmq
 
         context = zmq.Context()
-        socket = context.socket(zmq.REP)
+        socket = context.socket(zmq.PAIR)
         socket.bind("tcp://*:%s" % self._port)
 
         while True:
             try:
                 message = socket.recv()
                 # 先直接返回，反正那边并不关心成功失败
-                # 必须要调用send，否则zmq会报错 ZMQError: Operation cannot be accomplished in current state
-                socket.send('ok')
+                # client-server 模式下. 必须要调用send，否则zmq会报错 ZMQError: Operation cannot be accomplished in current state
+                # pair 模式下，不需要调用send
+                # socket.send('ok')
             except Exception, e:
                 logger.error('exception occur. msg[%s], traceback[%s]', str(e), __import__('traceback').format_exc())
                 continue

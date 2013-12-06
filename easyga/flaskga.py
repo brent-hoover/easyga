@@ -38,7 +38,7 @@ class FlaskGA(object):
             import zmq.green as zmq
 
         self._context = zmq.Context()
-        self._socket = self._context.socket(zmq.REQ)
+        self._socket = self._context.socket(zmq.PAIR)
         self._socket.connect("tcp://localhost:%(port)s" % dict(port=self._gaserver_port))
 
         @app.before_request
@@ -70,6 +70,10 @@ class FlaskGA(object):
             kwargs=kwargs or {},
         )
 
-        self._socket.send(pickle.dumps(data), zmq.NOBLOCK)
-        # 还需要recv，貌似不recv的话，会出问题
-        self._socket.recv()
+        try:
+            self._socket.send(pickle.dumps(data), zmq.NOBLOCK)
+        except Exception, e:
+            current_app.logger.error('exception occur. msg[%s], traceback[%s]', str(e), __import__('traceback').format_exc())
+        # 还需要recv，不recv的话，会出问题
+        # pair 模式下，不需要调用recv
+        # self._socket.recv()
