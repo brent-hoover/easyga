@@ -6,8 +6,6 @@
 通过zmq通道
 """
 
-import gevent
-
 import os
 from optparse import OptionParser
 import os.path as op
