@@ -47,18 +47,18 @@ class FlaskGA(object):
                 visitor = Visitor()
                 visitor.ip_address = request.remote_addr
 
-                send_data_to_gaserver(self, tracker, 'track_pageview', (page, session, visitor))
+                self.send_data_to_gaserver(tracker, 'track_pageview', (page, session, visitor))
             except Exception, e:
                 current_app.logger.error('exception occur. msg[%s], traceback[%s]', str(e), __import__('traceback').format_exc())
 
-        def send_data_to_gaserver(self, caller, funcname, args=None, kwargs=None):
-            data = dict(
-                caller=caller,
-                funcname=funcname,
-                args=args or [],
-                kwargs=kwargs or {},
-            )
+    def send_data_to_gaserver(self, caller, funcname, args=None, kwargs=None):
+        data = dict(
+            caller=caller,
+            funcname=funcname,
+            args=args or [],
+            kwargs=kwargs or {},
+        )
 
-            self._socket.send(pickle.dumps(data))
-            # 还需要recv，貌似不recv的话，会出问题
-            self._socket.recv()
+        self._socket.send(pickle.dumps(data))
+        # 还需要recv，貌似不recv的话，会出问题
+        self._socket.recv()
