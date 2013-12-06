@@ -7,15 +7,10 @@
 """
 
 import os
-import sys
-import time
 from optparse import OptionParser
 import os.path as op
-import pickle
-import functools
 import logging
 import logging.config
-import zmq
 
 from gaserver import GAServer
 

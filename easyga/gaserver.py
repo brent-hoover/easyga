@@ -15,6 +15,7 @@ import zmq
 
 logger = logging.getLogger('gaserver')
 
+
 def record_exception(func):
     @functools.wraps(func)
     def func_wrapper(*args, **kwargs):
@@ -31,7 +32,12 @@ def record_exception(func):
 def handle_message(message):
     data = pickle.loads(message)
 
-    return getattr(data['caller'], data['funcname'])(*data['args'], **data['kwargs'])
+    caller = data.get('caller', None)
+    funcname = data.get('funcname', None)
+    args = data.get('args', []) or []
+    kwargs = data.get('kwargs', {}) or {}
+
+    return getattr(caller, funcname)(*args, **kwargs)
 
 
 class GAServer(object):
@@ -40,6 +46,7 @@ class GAServer(object):
     def __init__(self, port):
         self._port = port
 
+    @record_exception
     def run(self):
         context = zmq.Context()
         socket = context.socket(zmq.REP)
@@ -47,5 +54,7 @@ class GAServer(object):
 
         while True:
             message = socket.recv()
+
+            #logger.debug(message)
 
             handle_message(message)
