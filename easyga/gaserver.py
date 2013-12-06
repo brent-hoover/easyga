@@ -22,7 +22,7 @@ def record_exception(func):
         try:
             return func(*args, **kwargs)
         except Exception, e:
-            logger.fatal('exception occur. msg[%s], traceback[%s]', str(e), __import__('traceback').format_exc())
+            logger.error('exception occur. msg[%s], traceback[%s]', str(e), __import__('traceback').format_exc())
             return None
 
     return func_wrapper
@@ -53,11 +53,15 @@ class GAServer(object):
         socket.bind("tcp://*:%s" % self._port)
 
         while True:
-            message = socket.recv()
+            try:
+                message = socket.recv()
+            except Exception, e:
+                logger.error('exception occur. msg[%s], traceback[%s]', str(e), __import__('traceback').format_exc())
+                continue
 
             #logger.debug(message)
 
             handle_message(message)
 
             # 必须要调用send，否则zmq会报错 ZMQError: Operation cannot be accomplished in current state
-            socket.send('ok')
+            #socket.send('ok')

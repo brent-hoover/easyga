@@ -64,4 +64,4 @@ class FlaskGA(object):
 
         self._socket.send(pickle.dumps(data))
         # 还需要recv，貌似不recv的话，会出问题
-        self._socket.recv()
+        #self._socket.recv()
