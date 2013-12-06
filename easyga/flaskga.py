@@ -70,6 +70,6 @@ class FlaskGA(object):
             kwargs=kwargs or {},
         )
 
-        self._socket.send(pickle.dumps(data))
+        self._socket.send(pickle.dumps(data), zmq.NOBLOCK)
         # 还需要recv，貌似不recv的话，会出问题
         self._socket.recv()

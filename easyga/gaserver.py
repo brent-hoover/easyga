@@ -55,13 +55,12 @@ class GAServer(object):
         while True:
             try:
                 message = socket.recv()
+                # 先直接返回，反正那边并不关心成功失败
+                # 必须要调用send，否则zmq会报错 ZMQError: Operation cannot be accomplished in current state
+                socket.send('ok')
             except Exception, e:
                 logger.error('exception occur. msg[%s], traceback[%s]', str(e), __import__('traceback').format_exc())
                 continue
 
             #logger.debug(message)
-
             handle_message(message)
-
-            # 必须要调用send，否则zmq会报错 ZMQError: Operation cannot be accomplished in current state
-            socket.send('ok')
