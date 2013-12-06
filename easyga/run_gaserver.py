@@ -118,7 +118,7 @@ def configure_logging():
     logging.config.dictConfig(LOGGING)
 
  
-def main():
+def run_gaserver():
     configure_logging()
 
     parser = build_parser()
@@ -130,4 +130,4 @@ def main():
     prog.run()
  
 if __name__ == '__main__':
-    main()
+    run_gaserver()
