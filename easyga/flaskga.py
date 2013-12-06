@@ -52,6 +52,9 @@ class FlaskGA(object):
                 current_app.logger.error('exception occur. msg[%s], traceback[%s]', str(e), __import__('traceback').format_exc())
 
     def send_data_to_gaserver(self, caller, funcname, args=None, kwargs=None):
+        """
+        可以在网站中调用
+        """
         data = dict(
             caller=caller,
             funcname=funcname,
