@@ -16,6 +16,9 @@ from pyga.requests import Tracker, Page, Session, Visitor
 class FlaskGA(object):
     _context = None
     _socket = None
+    _ga_id = None
+    _gaserver_port = None
+    _ga_use_gevent = False
 
     def __init__(self, app):
         if app:
@@ -25,23 +28,23 @@ class FlaskGA(object):
         """
         绑定app
         """
-        GA_ID = app.config['GA_ID']
-        GASERVER_PORT = app.config['GASERVER_PORT']
-        GA_USE_GEVENT = app.config.get('GA_USE_GEVENT', False)
+        self._ga_id = app.config['GA_ID']
+        self._gaserver_port = app.config['GASERVER_PORT']
+        self._ga_use_gevent = app.config.get('GA_USE_GEVENT', False)
 
-        if not GA_USE_GEVENT:
+        if not self._ga_use_gevent:
             import zmq
         else:
             import zmq.green as zmq
 
         self._context = zmq.Context()
         self._socket = self._context.socket(zmq.REQ)
-        self._socket.connect("tcp://localhost:%(port)s" % dict(port=GASERVER_PORT))
+        self._socket.connect("tcp://localhost:%(port)s" % dict(port=self._gaserver_port))
 
         @app.before_request
         def send_ga_data():
             try:
-                tracker = Tracker(GA_ID, request.host)
+                tracker = Tracker(self._ga_id, request.host)
                 session = Session()
                 page = Page(request.path)
                 visitor = Visitor()
@@ -55,6 +58,11 @@ class FlaskGA(object):
         """
         可以在网站中调用
         """
+        if not self._ga_use_gevent:
+            import zmq
+        else:
+            import zmq.green as zmq
+
         data = dict(
             caller=caller,
             funcname=funcname,
@@ -64,4 +72,4 @@ class FlaskGA(object):
 
         self._socket.send(pickle.dumps(data))
         # 还需要recv，貌似不recv的话，会出问题
-        #self._socket.recv()
+        self._socket.recv()
