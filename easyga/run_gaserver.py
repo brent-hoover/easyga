@@ -77,12 +77,13 @@ LOGGING = {
             'subject': '[supervisor-%s]Attention!' % FILE_MODULE_NAME,
             'credentials': ('xmonitor', 'xmr2013'),
         },
-        'file': {
+        'rotating_file': {
             'level': 'INFO',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'standard',
-            'filters': ['require_debug_true'],
             'filename': LOG_FILE_PATH,
+            'maxBytes': 1024 * 1024 * 500,  # 500 MB
+            'backupCount': 5,
         },
         'console': {
             'level': 'DEBUG',
@@ -94,12 +95,12 @@ LOGGING = {
 
     'loggers': {
         'default': {
-            'handlers': ['console', 'file', 'mail'],
+            'handlers': ['console', 'rotating_file', 'mail'],
             'level': 'DEBUG',
             'propagate': False
         },
         'gaserver': {
-            'handlers': ['console', 'file', 'mail'],
+            'handlers': ['console', 'rotating_file', 'mail'],
             'level': 'DEBUG',
             'propagate': False
         },
