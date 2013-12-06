@@ -16,7 +16,7 @@ context = zmq.Context()
 #  Socket to talk to server
 print "Connecting to hello world server..."
 
-port = 7500
+port = 5555
 
 socket = context.socket(zmq.REQ)
 socket.connect ("tcp://localhost:%(port)s" % dict(port=port))
