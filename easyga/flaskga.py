@@ -14,6 +14,9 @@ from pyga.requests import Tracker, Page, Session, Visitor
 
 
 class FlaskGA(object):
+    _context = None
+    _socket = None
+
     def __init__(self, app):
         if app:
             self.init_app(app)
@@ -31,9 +34,9 @@ class FlaskGA(object):
         else:
             import zmq.green as zmq
 
-        context = zmq.Context()
-        socket = context.socket(zmq.REQ)
-        socket.connect("tcp://localhost:%(port)s" % dict(port=GASERVER_PORT))
+        self._context = zmq.Context()
+        self._socket = self._context.socket(zmq.REQ)
+        self._socket.connect("tcp://localhost:%(port)s" % dict(port=GASERVER_PORT))
 
         @app.before_request
         def send_ga_data():
@@ -44,17 +47,18 @@ class FlaskGA(object):
                 visitor = Visitor()
                 visitor.ip_address = request.remote_addr
 
-                send_data = dict(
-                    caller=tracker,
-                    funcname='track_pageview',
-                    args=(page, session, visitor)
-                )
-
-                socket.send(pickle.dumps(send_data))
-
-                # 还需要recv，貌似不recv的话，会出问题
-
-                socket.recv()
+                send_data_to_gaserver(self, tracker, 'track_pageview', (page, session, visitor))
             except Exception, e:
                 current_app.logger.error('exception occur. msg[%s], traceback[%s]', str(e), __import__('traceback').format_exc())
 
+        def send_data_to_gaserver(self, caller, funcname, args=None, kwargs=None):
+            data = dict(
+                caller=caller,
+                funcname=funcname,
+                args=args or [],
+                kwargs=kwargs or {},
+            )
+
+            self._socket.send(pickle.dumps(data))
+            # 还需要recv，貌似不recv的话，会出问题
+            self._socket.recv()
