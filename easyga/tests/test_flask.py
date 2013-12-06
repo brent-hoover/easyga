@@ -9,7 +9,7 @@ from flaskga import FlaskGA
 DEBUG = True
 
 GA_ID = 'UA-32788866-33'
-GASERVER_PORT = 5555
+GASERVER_PORT = 7500
 
 app = Flask(__name__)
 app.config.from_object(__name__)
