@@ -22,9 +22,9 @@ class FlaskGA(object):
         """
         绑定app
         """
-        GA_ID = current_app.config['GA_ID']
-        GASERVER_PORT = current_app.config['GASERVER_PORT']
-        GA_USE_GEVENT = current_app.config.get('GA_USE_GEVENT', False)
+        GA_ID = app.config['GA_ID']
+        GASERVER_PORT = app.config['GASERVER_PORT']
+        GA_USE_GEVENT = app.config.get('GA_USE_GEVENT', False)
 
         if not GA_USE_GEVENT:
             import zmq
@@ -53,3 +53,5 @@ class FlaskGA(object):
             socket.send(pickle.dumps(send_data))
 
             # 还需要recv，貌似不recv的话，会出问题
+
+            socket.recv()
