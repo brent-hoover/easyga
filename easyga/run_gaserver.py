@@ -35,7 +35,7 @@ FILE_MODULE_NAME = op.splitext(op.basename(__file__))[0]
 
 MONITORS = ['xmonitor@qq.com']
 
-LOG_FILE_PATH = op.abspath(op.join(op.dirname(__file__), "%s.log" % FILE_MODULE_NAME))
+LOG_FILE_PATH = "/tmp/gaserver.log"
 
 LOG_FORMAT = '\n'.join((
     '/' + '-' * 80,
