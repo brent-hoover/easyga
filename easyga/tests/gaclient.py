@@ -23,14 +23,14 @@ socket.connect ("tcp://localhost:%(port)s" % dict(port=port))
 
 #  Do 10 requests, waiting each time for a response
 for request in range (1,1000):
-    repr_data = dict(
+    data = dict(
         caller=tracker,
         funcname='track_pageview',
         args=(page, session, visitor),
         kwargs=None
     )
     print "Sending request ", request,"..."
-    socket.send (pickle.dumps(repr_data))
+    socket.send (pickle.dumps(data))
     print "Sended request ", request,"..."
 
     #  Get the reply.

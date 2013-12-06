@@ -1,0 +1,51 @@
+# -*- coding: utf-8 -*-
+
+"""
+flask插件，绑定之后可以自动给本地的gaserver发送数据
+"""
+import pickle
+
+from flask import current_app, request, session
+from pyga.requests import Tracker, Page, Session, Visitor
+
+
+class FlaskGA(object):
+    def __init__(self, app):
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        """
+        绑定app
+        """
+        GA_ID = current_app.config['GA_ID']
+        GASERVER_PORT = current_app.config['GASERVER_PORT']
+        GA_USE_GEVENT = current_app.config.get('GA_USE_GEVENT', False)
+
+        if not GA_USE_GEVENT:
+            import zmq
+        else:
+            import zmq.green as zmq
+
+        context = zmq.Context()
+        socket = context.socket(zmq.REQ)
+        socket.connect("tcp://localhost:%(port)s" % dict(port=GASERVER_PORT))
+
+        @app.before_request
+        def send_ga_data():
+            print 'host', request.host
+            tracker = Tracker(GA_ID, request.host)
+            session = Session()
+            page = Page(request.path)
+            visitor = Visitor()
+            visitor.ip_address = request.remote_addr
+
+            send_data = dict(
+                caller=tracker,
+                funcname='track_pageview',
+                args=(page, session, visitor)
+            )
+
+            socket.send(pickle.dumps(send_data))
+
+            # 还需要recv，貌似不recv的话，会出问题
