@@ -6,6 +6,7 @@ flask插件，绑定之后可以自动给本地的gaserver发送数据
     GA_ID : Google分析的跟踪ID
     GASERVER_PORT : GAServer的启动端口
     GA_USE_GEVENT : 是否使用了gevent(True/False)，默认为False
+    GA_FORCE_HOST : 不使用请求中的host，强制替换host
 """
 import pickle
 
@@ -14,11 +15,13 @@ from pyga.requests import Tracker, Page, Session, Visitor
 
 
 class FlaskGA(object):
-    _context = None
-    _socket = None
     _ga_id = None
     _gaserver_port = None
     _ga_use_gevent = False
+    _ga_force_host = None
+
+    _context = None
+    _socket = None
 
     def __init__(self, app):
         if app:
@@ -31,6 +34,7 @@ class FlaskGA(object):
         self._ga_id = app.config['GA_ID']
         self._gaserver_port = app.config['GASERVER_PORT']
         self._ga_use_gevent = app.config.get('GA_USE_GEVENT', False)
+        self._ga_force_host = app.config.get('GA_FORCE_HOST', None)
 
         if not self._ga_use_gevent:
             import zmq
@@ -44,7 +48,7 @@ class FlaskGA(object):
         @app.before_request
         def send_ga_data():
             try:
-                tracker = Tracker(self._ga_id, request.host)
+                tracker = Tracker(self._ga_id, self._ga_force_host or request.host)
                 session = Session()
                 page = Page(request.path)
                 visitor = Visitor()
