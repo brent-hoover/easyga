@@ -2,6 +2,10 @@
 
 """
 flask插件，绑定之后可以自动给本地的gaserver发送数据
+要求配置:
+    GA_ID : Google分析的跟踪ID
+    GASERVER_PORT : GAServer的启动端口
+    GA_USE_GEVENT : 是否使用了gevent(True/False)，默认为False
 """
 import pickle
 
@@ -33,7 +37,7 @@ class FlaskGA(object):
 
         @app.before_request
         def send_ga_data():
-            print 'host', request.host
+            current_app.logger.info('host:' + request.host)
             tracker = Tracker(GA_ID, request.host)
             session = Session()
             page = Page(request.path)
