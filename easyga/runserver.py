@@ -17,7 +17,7 @@ import logging
 import logging.config
 import zmq
 
-from .gaserver import GAServer
+from gaserver import GAServer
 
 logger = logging.getLogger('default')
 
