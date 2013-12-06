@@ -58,3 +58,6 @@ class GAServer(object):
             #logger.debug(message)
 
             handle_message(message)
+
+            # 必须要调用send，否则zmq会报错 ZMQError: Operation cannot be accomplished in current state
+            socket.send('ok')
