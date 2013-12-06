@@ -11,8 +11,6 @@ import functools
 import logging
 import logging.config
 
-import zmq
-
 logger = logging.getLogger('gaserver')
 
 
@@ -41,13 +39,20 @@ def handle_message(message):
 
 
 class GAServer(object):
+    _use_gevent = False
     _port = None
 
-    def __init__(self, port):
+    def __init__(self, port, use_gevent=False):
         self._port = port
+        self._use_gevent = use_gevent
 
     @record_exception
     def run(self):
+        if not self._use_gevent:
+            import zmq
+        else:
+            import zmq.green as zmq
+
         context = zmq.Context()
         socket = context.socket(zmq.REP)
         socket.bind("tcp://*:%s" % self._port)
