@@ -55,7 +55,7 @@ class GAServer(object):
             import zmq.green as zmq
 
         context = zmq.Context()
-        socket = context.socket(zmq.PAIR)
+        socket = context.socket(zmq.REP)
         socket.bind("tcp://*:%s" % self._port)
 
         while True:
@@ -65,7 +65,7 @@ class GAServer(object):
                 # 先直接返回，反正那边并不关心成功失败
                 # client-server 模式下. 必须要调用send，否则zmq会报错 ZMQError: Operation cannot be accomplished in current state
                 # pair 模式下，不需要调用send
-                # socket.send('ok')
+                socket.send('ok')
             except Exception, e:
                 logger.error('exception occur. msg[%s], traceback[%s]', str(e), __import__('traceback').format_exc())
                 continue
