@@ -61,6 +61,7 @@ class GAServer(object):
         while True:
             try:
                 message = socket.recv()
+                logger.debug("msg len: %s" % len(message))
                 # 先直接返回，反正那边并不关心成功失败
                 # client-server 模式下. 必须要调用send，否则zmq会报错 ZMQError: Operation cannot be accomplished in current state
                 # pair 模式下，不需要调用send

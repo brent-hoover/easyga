@@ -12,6 +12,8 @@ import os.path as op
 import logging
 import logging.config
 
+import sys
+#sys.path.insert(0, '../../')
 from easyga.gaserver import GAServer
 
 logger = logging.getLogger('default')
