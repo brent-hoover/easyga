@@ -88,11 +88,17 @@ LOGGING = {
             'filters': ['require_debug_true'],
             'filename': LOG_FILE_PATH,
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+            'filters': ['require_debug_true'],
+        },
     },
 
     'loggers': {
         'default': {
-            'handlers': ['file', 'mail'],
+            'handlers': ['console', 'file', 'mail'],
             'level': 'DEBUG',
             'propagate': False
         },
@@ -155,9 +161,9 @@ def main():
     parser = build_parser()
     options, system = parser.parse_args()
  
-    logger.info('DEV_ENV:%s, port: %s', DEV_ENV, options.port)
-
     prog = GAServer(options.port)
+
+    logger.info("Running GAServer on %(port)s" % dict(port=options.port))
     prog.run()
  
 if __name__ == '__main__':
