@@ -56,7 +56,7 @@ class GAServer(object):
 
         context = zmq.Context()
         socket = context.socket(zmq.PAIR)
-        socket.bind("tcp://localhost:%s" % self._port)
+        socket.bind("tcp://*:%s" % self._port)
 
         while True:
             try:
